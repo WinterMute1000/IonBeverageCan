@@ -5,6 +5,7 @@
 #define ID_EDIT 101;
 #define CLS_NAME "IBC"
 #include <Windows.h>
+#include <Tlhelp32.h>
 typedef struct ui
 {
 	HWND h_combo; //Process Select ComboBox
@@ -19,4 +20,5 @@ void DrawFormerText(HWND,HDC*, PAINTSTRUCT*, HFONT);
 void SetWndClass(WNDCLASS*, HINSTANCE);
 void ButtonProc(WPARAM, LPARAM);
 void SelectDLLFIle(UI,HWND);
+void SetProcessComboBox(UI);
 #endif

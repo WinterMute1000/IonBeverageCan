@@ -1,2 +1,4 @@
 ﻿  IBCRoutine.c
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(96): warning C4047: '함수': 'LPARAM'의 간접 참조 수준이 'CHAR [260]'과(와) 다릅니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(96): warning C4024: 'SendMessageA': 형식 및 실제 매개 변수 4의 형식이 서로 다릅니다.
   IonBeverageCan.vcxproj -> C:\Users\reali\source\repos\IonBeverageCan\Debug\IonBeverageCan.exe

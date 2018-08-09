@@ -13,9 +13,9 @@ UI CreateUI(HINSTANCE hInstance,HWND h_wnd) //Making UI
 	UI return_ui;
 
 	return_ui.h_combo = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | CBS_DROPDOWN,
-		135, 110, 300, 80, h_wnd, (HMENU)100, hInstance, NULL); //ID_COMBOBOX=100
+		135, 110, 300, 500, h_wnd, (HMENU)100, hInstance, NULL); //ID_COMBOBOX=100
 	return_ui.h_edit = CreateWindow("combobox", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER |ES_AUTOHSCROLL,
-		135, 130, 300, 25, h_wnd, (HMENU)101, hInstance, NULL); //ID_EDIT=101
+		135, 130, 300,20, h_wnd, (HMENU)101, hInstance, NULL); //ID_EDIT=101
 	return_ui.font = CreateFont(15, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
 		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, VARIABLE_PITCH | FF_SWISS,
@@ -60,13 +60,48 @@ void SelectDLLFIle(UI ui,HWND h_wnd)
 	memset(&ofn, 0, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = h_wnd;
-	ofn.lpstrFilter = "Every File(*.*)\0*.*\0DLL File\0*.dll\0";
+	ofn.lpstrFilter = "Every File(*.*)\0*.*\0DLL File\0*.dll\0"; //DLL or The others?
 	ofn.lpstrFile = lpstrFile;
 	ofn.nMaxFile = 256;
 
-	if (GetOpenFileName(&ofn) != 0)
+	if (GetOpenFileName(&ofn) != 0) //Set EditBox File Name
 	{
 		SetDlgItemText(h_wnd, 101, ofn.lpstrFile);
 		MessageBox(h_wnd, "File Select","IBC", MB_OK);
 	}
 }
+
+void SetProcessComboBox(UI ui)
+{
+	int prior_proc_count = 0; //Why C isn't have CB_CLEAR?
+	prior_proc_count = SendMessage(ui.h_combo, CB_GETCOUNT, 0, 0);
+
+	if (prior_proc_count != 0)
+	{
+		for (int i = 0; i < prior_proc_count; i++)
+			SendMessage(ui.h_combo, CB_DELETESTRING, i, 0);
+	}
+
+	HWND h_tool = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); //To use snapshow, Get executing processes in now system
+
+	if ((int)h_tool != -1)
+	{
+		PROCESSENTRY32 pe32;
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+
+		if (Process32First(h_tool, &pe32))
+		{
+			for (int i = 0; i < 3;i++)
+				Process32Next(h_tool, &pe32); //Remove System,Registry String(File Name)
+			
+			do
+			{
+				if(strcmp("svchost.exe",pe32.szExeFile)!=0) //Except svchost.exe (Except svchost in First  Version)
+					SendMessage(ui.h_combo, CB_ADDSTRING, 0, pe32.szExeFile); //Set ComboBox to Now executing processes 
+			} while (Process32Next(h_tool, &pe32));
+		}
+
+		CloseHandle(h_tool);
+	}
+}
+

@@ -51,6 +51,14 @@ LRESULT CALLBACK WndProc(HWND h_wnd, UINT message, WPARAM w_param, LPARAM l_para
 		case 0: //DLL File Select Open
 			SelectDLLFIle(ui, h_wnd);
 			return 0;
+		case 100://ComboBox Clicked
+			switch (HIWORD(w_param))
+			{
+			case CBN_DROPDOWN:
+				SetProcessComboBox(ui);
+				break;
+			}
+			return 0;
 		}
 		return 0;
 	case WM_DESTROY:
