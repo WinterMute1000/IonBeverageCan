@@ -97,7 +97,8 @@ void SetProcessComboBox(UI ui)
 			do
 			{
 				if(strcmp("svchost.exe",pe32.szExeFile)!=0) //Except svchost.exe (Except svchost in First  Version)
-					SendMessage(ui.h_combo, CB_ADDSTRING, 0, pe32.szExeFile); //Set ComboBox to Now executing processes 
+					SendMessage(ui.h_combo, CB_ADDSTRING, 0, pe32.szExeFile); //Set ComboBox to Now executing processes
+
 			} while (Process32Next(h_tool, &pe32));
 		}
 
@@ -105,3 +106,88 @@ void SetProcessComboBox(UI ui)
 	}
 }
 
+BOOL InjectDLL(UI ui, HWND h_wnd)
+{
+	HANDLE h_process = NULL, h_thread = NULL;
+	HMODULE h_module = NULL;
+	DWORD path_size = 0; DWORD pid;
+	LPVOID path_buf = NULL;
+	LPTHREAD_START_ROUTINE p_thread_func=NULL;
+	char process_name[260];
+	char dll_file_path[256];
+
+
+	if (!GetWindowText(ui.h_combo, process_name, 260))
+	{
+		MessageBox(h_wnd, "Please Input Process File!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!GetWindowText(ui.h_edit, dll_file_path, 256))
+	{
+		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	pid = GetProcessPID(process_name);
+	path_size = (DWORD)(_tcslen(dll_file_path) + 1) * sizeof(TCHAR);
+
+	if (pid == -1)
+	{
+		MessageBox(h_wnd, "Get PID is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!(h_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid))) //Get Process Handle
+	{
+		MessageBox(h_wnd, "OpenProcess is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	path_buf = VirtualAllocEx(h_process, NULL, path_size, MEM_COMMIT, PAGE_READWRITE); //Memory Allocation(Size:path_size))
+	WriteProcessMemory(h_process, path_buf, (LPVOID)dll_file_path, sizeof(dll_file_path), NULL); //Write File Path
+
+	h_module = GetModuleHandle("kernel32.dll");
+	p_thread_func = (LPTHREAD_START_ROUTINE)GetProcAddress(h_module, "LoadLibraryW"); //Get LoadLibraryW
+	
+	h_thread = CreateRemoteThread(h_process, NULL, 0, p_thread_func, path_buf, 0, NULL); //CreateRemoteThread
+	
+	if (WaitForSingleObject(h_thread, 1000 * 180) == WAIT_TIMEOUT)//Wait Thread Signaled 3 minutes
+	{
+		CloseHandle(h_thread);
+		CloseHandle(h_process);
+		return FALSE;
+	}
+
+	CloseHandle(h_thread);
+	CloseHandle(h_process);
+	return TRUE;
+}
+
+DWORD GetProcessPID(char* process_name) //Get PID
+{
+	HWND h_tool = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+
+	if ((int)h_tool != -1)
+	{
+		PROCESSENTRY32 pe32;
+		pe32.dwSize = sizeof(PROCESSENTRY32);
+
+		if (Process32First(h_tool, &pe32))
+		{
+			do
+			{
+				if (!strcmp(process_name, pe32.szExeFile))
+				{
+					CloseHandle(h_tool);
+					return pe32.th32ProcessID; //success
+				}
+
+			} while (Process32Next(h_tool, &pe32));
+		}
+
+		CloseHandle(h_tool);
+	}
+	return -1; //fail
+}

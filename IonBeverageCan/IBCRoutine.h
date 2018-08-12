@@ -6,6 +6,7 @@
 #define CLS_NAME "IBC"
 #include <Windows.h>
 #include <Tlhelp32.h>
+#include <tchar.h>
 typedef struct ui
 {
 	HWND h_combo; //Process Select ComboBox
@@ -21,4 +22,6 @@ void SetWndClass(WNDCLASS*, HINSTANCE);
 void ButtonProc(WPARAM, LPARAM);
 void SelectDLLFIle(UI,HWND);
 void SetProcessComboBox(UI);
+BOOL InjectDLL(UI,HWND);
+DWORD GetProcessPID(char*);
 #endif
