@@ -51,11 +51,17 @@ LRESULT CALLBACK WndProc(HWND h_wnd, UINT message, WPARAM w_param, LPARAM l_para
 		case 0: //DLL File Select Open
 			SelectDLLFIle(ui, h_wnd);
 			return 0;
-		case 1:
+		case 1: //Injection Button
 			if (InjectDLL(ui,h_wnd))
 				MessageBox(h_wnd, "Injection success!", "IBC", MB_OK);
 			else 
 				MessageBox(h_wnd, "Injection fail!", "IBC", MB_OK);
+			return 0;
+		case 2: //Ejection Button
+			if (EjectDLL(ui, h_wnd))
+				MessageBox(h_wnd, "Ejection success!", "IBC", MB_OK);
+			else
+				MessageBox(h_wnd, "Ejection fail!", "IBC", MB_OK);
 			return 0;
 		case 100://ComboBox Clicked
 			switch (HIWORD(w_param))

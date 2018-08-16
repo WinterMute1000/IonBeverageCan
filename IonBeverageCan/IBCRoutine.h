@@ -23,5 +23,7 @@ void ButtonProc(WPARAM, LPARAM);
 void SelectDLLFIle(UI,HWND);
 void SetProcessComboBox(UI);
 BOOL InjectDLL(UI,HWND);
+BOOL EjectDLL(UI, HWND);
+BOOL SetPrivilege(LPCTSTR, BOOL);
 DWORD GetProcessPID(char*);
 #endif

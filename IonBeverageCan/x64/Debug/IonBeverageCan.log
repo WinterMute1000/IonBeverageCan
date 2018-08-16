@@ -1,8 +1,9 @@
 ﻿  IBCRoutine.c
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(37): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(38): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(77): warning C4244: '=': 'LRESULT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(87): warning C4311: '형식 캐스팅': 'HWND'에서 'int'(으)로 포인터가 잘립니다.
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(100): warning C4047: '함수': 'LPARAM'의 간접 참조 수준이 'CHAR [260]'과(와) 다릅니다.
-c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(100): warning C4024: 'SendMessageA': 형식 및 실제 매개 변수 4의 형식이 서로 다릅니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(39): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(40): warning C4267: '함수': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(79): warning C4244: '=': 'LRESULT'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(89): warning C4311: '형식 캐스팅': 'HWND'에서 'int'(으)로 포인터가 잘립니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(102): warning C4047: '함수': 'LPARAM'의 간접 참조 수준이 'CHAR [260]'과(와) 다릅니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(102): warning C4024: 'SendMessageA': 형식 및 실제 매개 변수 4의 형식이 서로 다릅니다.
+c:\users\reali\source\repos\ionbeveragecan\ionbeveragecan\ibcroutine.c(174): warning C4311: '형식 캐스팅': 'HWND'에서 'int'(으)로 포인터가 잘립니다.
   IonBeverageCan.vcxproj -> C:\Users\reali\source\repos\IonBeverageCan\x64\Debug\IonBeverageCan.exe

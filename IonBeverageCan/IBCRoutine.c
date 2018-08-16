@@ -23,7 +23,9 @@ UI CreateUI(HINSTANCE hInstance,HWND h_wnd) //Making UI
 	CreateWindow("button", "...", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 		435,130, 50, 25, h_wnd, (HMENU)0, hInstance, NULL); //If it is clicked, open file selecter  
 	CreateWindow("button", "Inject", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-		250, 180, 80, 25, h_wnd, (HMENU)1, hInstance, NULL); //Injection Button;
+		200, 180, 80, 25, h_wnd, (HMENU)1, hInstance, NULL); //Injection Button;
+	CreateWindow("button", "Eject", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+		280, 180, 80, 25, h_wnd, (HMENU)2, hInstance, NULL); //Ejection Button;
 
 	return return_ui;
 }
@@ -190,4 +192,135 @@ DWORD GetProcessPID(char* process_name) //Get PID
 		CloseHandle(h_tool);
 	}
 	return -1; //fail
+}
+
+BOOL EjectDLL(UI ui, HWND h_wnd)
+{
+	HANDLE h_process = NULL, h_thread = NULL,h_snapshot=NULL;
+	HMODULE h_module = NULL;
+	DWORD path_size = 0; DWORD pid;
+	LPVOID path_buf = NULL;
+	LPTHREAD_START_ROUTINE p_thread_func = NULL;
+	char process_name[260];
+	char dll_file_path[256];
+	char* dll=NULL,*temp = NULL;
+	MODULEENTRY32 me32 = { sizeof(me32) };
+	BOOL is_found_dll=FALSE;
+
+
+
+	if (!GetWindowText(ui.h_combo, process_name, 260))
+	{
+		MessageBox(h_wnd, "Please Input Process File!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!GetWindowText(ui.h_edit, dll, 256))
+	{
+		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if ((temp = strtok_s(dll_file_path, "\"", NULL)))//Get DLL Name
+	{
+		while (temp = strtok_s(dll_file_path, "\"", NULL))
+			strcpy_s(dll, strnlen_s(temp, 256), temp);
+	}
+	else
+		strcpy_s(dll, strnlen_s(dll_file_path, 256), dll_file_path); //if parameter isn't path(is just DLL name)
+
+	pid = GetProcessPID(process_name);
+	path_size = (DWORD)(_tcslen(dll) + 1) * sizeof(TCHAR);
+
+	if (pid == -1)
+	{
+		MessageBox(h_wnd, "Get PID is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!(h_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid))) //Get Process Handle
+	{
+		MessageBox(h_wnd, "OpenProcess is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!SetPrivilege(SE_DEBUG_NAME, TRUE))
+	{
+		MessageBox(h_wnd, "SetPrivilege is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	h_snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+	
+	if (Module32First(h_snapshot, &me32))
+	{
+		while (Module32Next(h_snapshot, &me32)) //Search DLL 
+		{
+			if (!_tcsicmp((LPCSTR)me32.szModule, dll) ||
+				!_tcsicmp((LPCSTR)me32.szExePath, dll))
+			{
+				is_found_dll = TRUE;
+				break;
+			}
+		}
+	}
+	
+	if (!is_found_dll)
+	{
+		CloseHandle(h_snapshot);
+		MessageBox(h_wnd, "DLL Search is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	if (!(h_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid))) //Get Process Handle
+	{
+		MessageBox(h_wnd, "OpenProcess is Fail!", "IBC", MB_OK);
+		return FALSE;
+	}
+
+	h_module = GetModuleHandle("kernel32.dll");
+	p_thread_func = (LPTHREAD_START_ROUTINE)GetProcAddress(h_module, "FreeLibrary"); //FreeLibrary
+	h_thread = CreateRemoteThread(h_process, NULL, 0, p_thread_func, me32.modBaseAddr, 0, NULL); //CreateRemoteThread
+	 
+	if (WaitForSingleObject(h_thread, 1000 * 180) == WAIT_TIMEOUT)//Wait Thread Signaled 3 minutes
+	{
+		CloseHandle(h_thread);
+		CloseHandle(h_process);
+		CloseHandle(h_snapshot);
+		return FALSE;
+	}
+	CloseHandle(h_thread);
+	CloseHandle(h_process);
+	CloseHandle(h_snapshot);
+	return TRUE;
+}
+
+BOOL SetPrivilege(LPCTSTR privilege, BOOL enable_privilege)//This function From in the book(Named ¸®¹ö½Ì ÇÙ½É¿ø¸® author ÀÌ½Â¿ø) 
+{ //Get Privilege
+	TOKEN_PRIVILEGES tp;
+	HANDLE h_token;
+	LUID luid;
+
+	if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,
+		&h_token))
+		return FALSE;
+
+	if (LookupPrivilegeValue(NULL, privilege, &luid))
+		return FALSE;
+
+	tp.PrivilegeCount = 1;
+	tp.Privileges[0].Luid = luid;
+	if (enable_privilege)
+		tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+	else
+		tp.Privileges[0].Attributes = 0;
+
+	if (!AdjustTokenPrivileges(h_token, FALSE, &tp, sizeof(TOKEN_PRIVILEGES),
+		(PTOKEN_PRIVILEGES)NULL, (PDWORD)NULL))
+		return FALSE;
+	if (GetLastError() == ERROR_NOT_ALL_ASSIGNED)
+	{
+		return FALSE;
+	}
+	return TRUE;
 }
