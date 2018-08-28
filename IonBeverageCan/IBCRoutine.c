@@ -203,7 +203,7 @@ BOOL EjectDLL(UI ui, HWND h_wnd)
 	LPTHREAD_START_ROUTINE p_thread_func = NULL;
 	char process_name[260];
 	char dll_file_path[256];
-	char* dll=NULL,*temp = NULL;
+	char* temp = NULL,*context=NULL;
 	MODULEENTRY32 me32 = { sizeof(me32) };
 	BOOL is_found_dll=FALSE;
 
@@ -215,22 +215,15 @@ BOOL EjectDLL(UI ui, HWND h_wnd)
 		return FALSE;
 	}
 
-	if (!GetWindowText(ui.h_edit, dll, 256))
+
+	if (!GetWindowText(ui.h_edit, dll_file_path, 256))
 	{
 		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
 		return FALSE;
 	}
 
-	if ((temp = strtok_s(dll_file_path, "\"", NULL)))//Get DLL Name
-	{
-		while (temp = strtok_s(dll_file_path, "\"", NULL))
-			strcpy_s(dll, strnlen_s(temp, 256), temp);
-	}
-	else
-		strcpy_s(dll, strnlen_s(dll_file_path, 256), dll_file_path); //if parameter isn't path(is just DLL name)
-
 	pid = GetProcessPID(process_name);
-	path_size = (DWORD)(_tcslen(dll) + 1) * sizeof(TCHAR);
+	path_size = (DWORD)(_tcslen(dll_file_path) + 1) * sizeof(TCHAR);
 
 	if (pid == -1)
 	{
@@ -256,8 +249,8 @@ BOOL EjectDLL(UI ui, HWND h_wnd)
 	{
 		while (Module32Next(h_snapshot, &me32)) //Search DLL 
 		{
-			if (!_tcsicmp((LPCSTR)me32.szModule, dll) ||
-				!_tcsicmp((LPCSTR)me32.szExePath, dll))
+			if (!_tcsicmp((LPCSTR)me32.szModule, dll_file_path) ||
+				!_tcsicmp((LPCSTR)me32.szExePath, dll_file_path))
 			{
 				is_found_dll = TRUE;
 				break;

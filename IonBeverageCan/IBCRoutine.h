@@ -7,6 +7,8 @@
 #include <Windows.h>
 #include <Tlhelp32.h>
 #include <tchar.h>
+#include <stdio.h>
+#include <sys/types.h>
 typedef struct ui
 {
 	HWND h_combo; //Process Select ComboBox
