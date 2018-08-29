@@ -118,14 +118,23 @@ BOOL InjectDLL(UI ui, HWND h_wnd)
 	char process_name[260];
 	char dll_file_path[256];
 
-
 	if (!GetWindowText(ui.h_combo, process_name, 260))
 	{
-		MessageBox(h_wnd, "Please Input Process File!", "IBC", MB_OK);
+		MessageBox(h_wnd, "Please Input Process Name!", "IBC", MB_OK);
+		return FALSE;
+	}
+	else if (slre_match(EXE_REGEX, process_name, strnlen_s(process_name, 260), NULL, 0, 0) == -1)
+	{
+		MessageBox(h_wnd, "Please Input Process Name!", "IBC", MB_OK);
 		return FALSE;
 	}
 
 	if (!GetWindowText(ui.h_edit, dll_file_path, 256))
+	{
+		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
+		return FALSE;
+	}
+	else if (slre_match(DLL_REGEX, dll_file_path, strnlen_s(process_name, 256), NULL, 0, 0) == -1)
 	{
 		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
 		return FALSE;
@@ -211,14 +220,24 @@ BOOL EjectDLL(UI ui, HWND h_wnd)
 
 	if (!GetWindowText(ui.h_combo, process_name, 260))
 	{
-		MessageBox(h_wnd, "Please Input Process File!", "IBC", MB_OK);
+		MessageBox(h_wnd, "Please Input Process Name!", "IBC", MB_OK);
+		return FALSE;
+	}
+	else if (slre_match(EXE_REGEX, process_name, strnlen_s(process_name, 260), NULL, 0, 0) == -1)
+	{
+		MessageBox(h_wnd, "Please Input Process Name!", "IBC", MB_OK);
 		return FALSE;
 	}
 
 
 	if (!GetWindowText(ui.h_edit, dll_file_path, 256))
 	{
-		MessageBox(h_wnd, "Please Input DLL File!", "IBC", MB_OK);
+		MessageBox(h_wnd, "Please Input DLL File Name!", "IBC", MB_OK);
+		return FALSE;
+	}
+	else if (slre_match(NO_PATH_DLL_REGEX, dll_file_path, strnlen_s(process_name, 256), NULL, 0, 0) == -1)
+	{
+		MessageBox(h_wnd, "Please Input DLL File Name!", "IBC", MB_OK);
 		return FALSE;
 	}
 

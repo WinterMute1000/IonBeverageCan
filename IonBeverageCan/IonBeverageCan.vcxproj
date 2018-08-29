@@ -84,6 +84,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,9 +118,11 @@
   <ItemGroup>
     <ClCompile Include="IBCRoutine.c" />
     <ClCompile Include="Main.c" />
+    <ClCompile Include="slre.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IBCRoutine.h" />
+    <ClInclude Include="slre.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

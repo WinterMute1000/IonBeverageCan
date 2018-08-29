@@ -9,6 +9,11 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include "slre.h"
+#define EXE_REGEX ".*?(\.)(exe)$"
+#define DLL_REGEX ".*?(\.)(dll)$"
+#define NO_PATH_DLL_REGEX "/^([a-z0-9-]+)\.exe$/i"
+
 typedef struct ui
 {
 	HWND h_combo; //Process Select ComboBox
